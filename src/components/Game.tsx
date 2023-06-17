@@ -1,37 +1,84 @@
 import { useState, useEffect } from "react";
 import Board from "./Board";
-import createSudoku from "../helpers/createSudoku";
+import { createSudoku, isValid } from "../helpers/createSudoku";
 
 const Game = () => {
-  const [difficulty, setDifficulty] = useState("easy");
-  const [sudoku, setSudoku] = useState(createSudoku(difficulty));
-  /* const [attempts, setAttempts] = useState(0);
+  const [sudoku, setSudoku] = useState<number[][]>([]);
+  const [initialSudoku, setInitialSudoku] = useState<number[][]>([]);
+  const [isCorrect, setIsCorrect] = useState<boolean[][]>([]);
 
+  let isThereAWinner = false;
 
+  useEffect(() => {
+    isThereAWinner = isCorrect.every((row) =>
+      row.every((elem) => elem == true)
+    );
+    console.log("aers");
+  }, [isCorrect]);
 
-  /* useEffect(() => {
-    fetch(`https://random-word-api.herokuapp.com/word?length=${wordLength}`)
-      .then((res) => res.json())
-      .then((data) => setWord(data.toString().split("")));
-  }, []); */
+  /* console.log("sudoku", sudoku);
+  console.log("INsudoku", initialSudoku); */
+  /* console.log("isCorrect", isCorrect); */
+  console.log("isCorrect", isCorrect);
+  console.log("isThereAWinner", isThereAWinner);
 
-  console.log(sudoku);
+  function handleNewGame(event: React.FormEvent<HTMLFormElement>): void {
+    event.preventDefault();
+    const difficulty: string = (
+      event.currentTarget.querySelector(
+        'select[name="difficulty"]'
+      ) as HTMLSelectElement
+    ).value;
+    const newSudoku = createSudoku(difficulty);
+    const newInitialSudoku = newSudoku.map((row) => [...row]);
+    const newIsCorrect = newInitialSudoku.map((row) =>
+      row.map((elem) => elem > 0)
+    );
 
-  function handleNewGame(): void {
-    console.log("new game");
+    setSudoku(newSudoku);
+    setInitialSudoku(newInitialSudoku);
+    setIsCorrect(newIsCorrect);
+  }
+
+  function handleChange(
+    event: React.ChangeEvent<HTMLInputElement>,
+    row: number,
+    col: number
+  ) {
+    const newValue = parseInt(event.target.value, 10);
+    console.log(isValid(sudoku, row, col, newValue));
+    setIsCorrect((prevIsCorrect) => {
+      let arr = prevIsCorrect.map((row) => [...row]);
+      arr[row][col] = isValid(sudoku, row, col, newValue);
+      return arr;
+    });
+    setSudoku((prevSudoku) => {
+      let arr = prevSudoku.map((row) => [...row]);
+      arr[row][col] = newValue;
+      return arr;
+    });
   }
 
   return (
     <main>
-      <section className="difficulty-section">
+      <form onSubmit={handleNewGame} className="difficulty-section">
         <select name="difficulty">
           <option value="easy">Easy</option>
           <option value="medium">Medium</option>
           <option value="hard">Hard</option>
         </select>
-        <button onClick={handleNewGame}>New Game</button>
-      </section>
-      <Board sudoku={sudoku}></Board>
+        <button type="submit">New Game</button>
+      </form>
+      {isThereAWinner ? (
+        <h1>Congratulations!! Try Again!!</h1>
+      ) : (
+        <Board
+          initialSudoku={initialSudoku}
+          sudoku={sudoku}
+          handleChange={handleChange}
+          isCorrect={isCorrect}
+        ></Board>
+      )}
     </main>
   );
 };

@@ -197,6 +197,23 @@ input {
   text-align: center;
 }
 
+.fixed {
+  pointer-events: none;
+}
+
+.correct {
+  color: var(--clr-green-400);
+}
+.incorrect {
+  color: var(--clr-red-400);
+}
+
+h1 {
+  color: var(--clr-gray-200);
+  font-weight: var(--font-weight-bold);
+  text-align: center;
+}
+
 input::-webkit-outer-spin-button,
 input::-webkit-inner-spin-button {
   -webkit-appearance: none;
