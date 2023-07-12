@@ -1,27 +1,24 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import Board from "./Board";
 import { createSudoku, isValid } from "../helpers/createSudoku";
 
 const Game = () => {
+  //main sudoku state to hold the original sudoku values and the user input
   const [sudoku, setSudoku] = useState<number[][]>([]);
+  //keep track of the original values to disable interaction in these cells
   const [initialSudoku, setInitialSudoku] = useState<number[][]>([]);
-  const [isCorrect, setIsCorrect] = useState<boolean[][]>([]);
+  //matrix to gold the correct values, there is a winner if the entire matrix is true
+  const [isCorrect, setIsCorrect] = useState<boolean[][]>(
+    Array(9)
+      .fill(undefined)
+      .map(() => Array(9).fill(false))
+  );
 
-  let isThereAWinner = false;
+  let isThereAWinner = isCorrect.every((row) =>
+    row.every((elem) => elem == true)
+  );
 
-  useEffect(() => {
-    isThereAWinner = isCorrect.every((row) =>
-      row.every((elem) => elem == true)
-    );
-    console.log("aers");
-  }, [isCorrect]);
-
-  /* console.log("sudoku", sudoku);
-  console.log("INsudoku", initialSudoku); */
-  /* console.log("isCorrect", isCorrect); */
-  console.log("isCorrect", isCorrect);
-  console.log("isThereAWinner", isThereAWinner);
-
+  //Function to start a new game and initialize the three main state variables
   function handleNewGame(event: React.FormEvent<HTMLFormElement>): void {
     event.preventDefault();
     const difficulty: string = (
@@ -40,13 +37,13 @@ const Game = () => {
     setIsCorrect(newIsCorrect);
   }
 
+  //Function update the sudoku and isCorrect states on the change of a cell
   function handleChange(
     event: React.ChangeEvent<HTMLInputElement>,
     row: number,
     col: number
   ) {
     const newValue = parseInt(event.target.value, 10);
-    console.log(isValid(sudoku, row, col, newValue));
     setIsCorrect((prevIsCorrect) => {
       let arr = prevIsCorrect.map((row) => [...row]);
       arr[row][col] = isValid(sudoku, row, col, newValue);

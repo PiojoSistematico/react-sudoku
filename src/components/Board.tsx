@@ -1,5 +1,4 @@
 import Square from "./Square";
-import { isValid } from "../helpers/createSudoku";
 
 type BoardProps = {
   initialSudoku: number[][];
